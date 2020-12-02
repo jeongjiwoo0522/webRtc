@@ -6,7 +6,7 @@ import { BusinessLogic, NextFunction } from "./BusinessLogic";
 
 const DOMAIN_NAME = "http://localhost:8005";
 
-const webSocket = (server: Server, app: Application, sessionMiddleware?: BusinessLogic) => {
+const webSocket = (server: Server, app: Application) => {
   const io = SocketIO(server);
   app.set("io", io);
 

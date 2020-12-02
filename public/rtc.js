@@ -26,7 +26,7 @@ let room; // room name
 // Could prompt for room name:
 room = prompt('Enter room name:');
 
-const socket = io.connect();
+const socket = io.connect("https://localhost:3000");
 
 if (room !== '') {
   socket.emit('create or join', room);
@@ -166,7 +166,7 @@ function createPeerConnection() {
     return;
   }
 }
-
+  
 function handleIceCandidate(event) {
   console.log('icecandidate event: ', event);
   if (event.candidate) {
