@@ -7,6 +7,7 @@ import session from "express-session";
 import nunjucks from "nunjucks";
 import * as dotenv from "dotenv";
 import ColorHash from "color-hash";
+import { v4 } from "uuid";
 
 import webSocket from "./socket";
 import connect from "./models";
@@ -34,22 +35,23 @@ const useColorHashMiddleware: BusinessLogic = (req, res, next) => {
   next();
 }
 
-const sessionMiddleware: BusinessLogic = session({
-  secret: process.env.COOKIE_SECRET!,
-  resave: false,
-  saveUninitialized: false
-});
-
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/gif", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(sessionMiddleware);
 app.use(useColorHashMiddleware);
 
 app.use("/", indexRouter);
+app.get("/rtc", (req: Request, res: Response) => {
+  res.render("index");
+});
+
+app.get("/rtc/:room", (req: Request, res: Response) => {
+  console.log(req.params.room);
+  res.render("index", { roomId: req.params.room });
+});
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const err = new httpError(404, `${req.method} ${req.url} 라우터가 없습니다`);
@@ -62,8 +64,4 @@ app.use((err: httpError, req: Request, res: Response, next: NextFunction) => {
   res.status(err.status);
 });
 
-const server = app.listen(app.get("port"), () => {
-  console.log("server on ", app.get("port"));
-});
-
-webSocket(server, app, sessionMiddleware);
+export default app;

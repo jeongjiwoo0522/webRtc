@@ -6,17 +6,17 @@ import { BusinessLogic, NextFunction } from "./BusinessLogic";
 
 const DOMAIN_NAME = "http://localhost:8005";
 
-const webSocket = (server: Server, app: Application, sessionMiddleware: BusinessLogic) => {
-  const io = SocketIO(server, { path: "/socket.io" });
+const webSocket = (server: Server, app: Application, sessionMiddleware?: BusinessLogic) => {
+  const io = SocketIO(server);
   app.set("io", io);
 
   const room = io.of("/room");
   const chat = io.of("/chat");
   const rtc = io.of("/rtc");
 
-  io.use((socket: Socket, next: NextFunction) => {
-    sessionMiddleware(socket.request, socket.request.res, next);
-  });
+  //io.use((socket: Socket, next: NextFunction) => {
+  //  sessionMiddleware(socket.request, socket.request.res, next);
+  //});
 
   room.on("connection", (socket: Socket) => {
     console.log("chat namespace connection");
@@ -59,15 +59,7 @@ const webSocket = (server: Server, app: Application, sessionMiddleware: Business
   });
 
   rtc.on("connection", (socket: Socket) => {
-    console.log("rtc connection");
-    socket.on("message", (data: object) => {
-      console.log(data);
-    });
-    socket.on("stream", (stream) => {
-      console.log(stream);
-      setTimeout(() => console.log(stream), 3000);
-      socket.emit("stream", stream);
-    });
+    console.log("rtc socket connected");
   });
 }
 
